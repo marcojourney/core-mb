@@ -46,11 +46,12 @@ jobs:
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-${{ matrix.node-version }}-${{ github.run_id }}
           path: |
             coverage/lcov-report
             coverage/clover.xml
             test-report.html
+
 
       # Optionally: print coverage summary in logs
       - name: Print coverage summary
