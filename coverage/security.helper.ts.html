@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.42% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>27/28</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.42% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>27/28</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
@@ -142,37 +142,19 @@
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a>
 <a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -240,7 +222,10 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as crypto from "crypto";
+import { CoreMBConfig } from "./config";
 import { normalize } from "./phone.number.helper";
+&nbsp;
+const config = CoreMBConfig.getInstance();
 &nbsp;
 export type PhoneCipherRecord = {
   // Base64 strings suitable for storage in text columns
@@ -250,24 +235,12 @@ export type PhoneCipherRecord = {
   hmacIndex: string; // HMAC-SHA256(phoneNormalized) for search/dedup
 };
 &nbsp;
-const aesKeyB64 = process.env.PHONE_AES_KEY;
-const hmacKeyB64 = process.env.PHONE_HMAC_KEY;
-&nbsp;
-<span class="missing-if-branch" title="if path not taken" >I</span>if (!aesKeyB64 || !hmacKeyB64) {
-<span class="cstat-no" title="statement not covered" >  throw new Error(</span>
-    "PHONE_AES_KEY and PHONE_HMAC_KEY must be set (base64-encoded)."
-  );
-}
-&nbsp;
-const aesKey = Buffer.from(aesKeyB64, "base64");
-const hmacKey = Buffer.from(hmacKeyB64, "base64");
-&nbsp;
 /** Create an HMAC index for lookups without revealing the number.
  * Store this alongside the encrypted data and index it in the DB.
  */
 export function hmacIndex(phoneRaw: string): string {
   const normalized = normalize(phoneRaw);
-  const h = crypto.createHmac("sha256", hmacKey);
+  const h = crypto.createHmac("sha256", config.hmacKey);
   h.update(normalized, "utf8");
   return h.digest("base64");
 }
@@ -283,7 +256,7 @@ export function phoneEncrypt(
   // 12-byte IV is recommended for GCM
   const iv = crypto.randomBytes(12);
 &nbsp;
-  const cipher = crypto.createCipheriv("aes-256-gcm", aesKey, iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", config.aesKey, iv);
 &nbsp;
   // Optional: bind additional data (AAD), e.g., tenant ID to prevent cross-tenant swaps
   // cipher.setAAD(Buffer.from(tenantId, 'utf8'));
@@ -313,7 +286,7 @@ export function phoneDecrypt(
   const authTag = Buffer.from(record.authTag, "base64");
   const ciphertext = Buffer.from(record.ciphertext, "base64");
 &nbsp;
-  const decipher = crypto.createDecipheriv("aes-256-gcm", aesKey, iv);
+  const decipher = crypto.createDecipheriv("aes-256-gcm", config.aesKey, iv);
 &nbsp;
   // If you used setAAD on encrypt, you MUST set the same AAD here
   // decipher.setAAD(Buffer.from(tenantId, 'utf8'));
@@ -334,7 +307,7 @@ export function phoneDecrypt(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-23T07:38:05.211Z
+                at 2025-08-23T08:06:17.198Z
             </div>
         <script src="prettify.js"></script>
         <script>

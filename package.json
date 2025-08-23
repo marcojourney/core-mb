@@ -1,6 +1,6 @@
 {
   "name": "core-mb",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Core utility functions for the MB ecosystem in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,11 @@
     "typescript"
   ],
   "author": "Marco Bytes",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcojourney/core-mb.git"
+  },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.11",
