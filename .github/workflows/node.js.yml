@@ -55,4 +55,4 @@ jobs:
 
       # Optionally: print coverage summary in logs
       - name: Print coverage summary
-        run: npx nyc report --reporter=text
+        run: npx nyc report --reporter=text-summary
