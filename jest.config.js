@@ -4,8 +4,9 @@ module.exports = {
   setupFiles: ["<rootDir>/jest.setup.ts"],
   collectCoverage: true, // enable coverage
   coverageDirectory: "coverage", // output folder
-  coverageReporters: ["text", "lcov", "html"], // text in terminal + HTML report
+  coverageReporters: ["text-summary", "lcov", "html"], // text in terminal + HTML report
   testMatch: ["**/*.spec.ts"], // only run *.spec.ts files
+  coveragePathIgnorePatterns: ["/node_modules/"],
   reporters: [
     "default",
     ["jest-html-reporter", {
