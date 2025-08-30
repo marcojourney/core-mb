@@ -2,8 +2,6 @@ import * as crypto from "crypto";
 import { CoreMBConfig } from "./config";
 import { normalize } from "./phone.number.helper";
 
-const config = CoreMBConfig.getInstance();
-
 export type PhoneCipherRecord = {
   // Base64 strings suitable for storage in text columns
   ciphertext: string; // Encrypted phone number
@@ -17,7 +15,7 @@ export type PhoneCipherRecord = {
  */
 export function hmacIndex(phoneRaw: string): string {
   const normalized = normalize(phoneRaw);
-  const h = crypto.createHmac("sha256", config.hmacKey);
+  const h = crypto.createHmac("sha256", CoreMBConfig.getInstance().hmacKey);
   h.update(normalized, "utf8");
   return h.digest("base64");
 }
@@ -33,7 +31,7 @@ export function phoneEncrypt(
   // 12-byte IV is recommended for GCM
   const iv = crypto.randomBytes(12);
 
-  const cipher = crypto.createCipheriv("aes-256-gcm", config.aesKey, iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", CoreMBConfig.getInstance().aesKey, iv);
 
   // Optional: bind additional data (AAD), e.g., tenant ID to prevent cross-tenant swaps
   // cipher.setAAD(Buffer.from(tenantId, 'utf8'));
@@ -63,7 +61,7 @@ export function phoneDecrypt(
   const authTag = Buffer.from(record.authTag, "base64");
   const ciphertext = Buffer.from(record.ciphertext, "base64");
 
-  const decipher = crypto.createDecipheriv("aes-256-gcm", config.aesKey, iv);
+  const decipher = crypto.createDecipheriv("aes-256-gcm", CoreMBConfig.getInstance().aesKey, iv);
 
   // If you used setAAD on encrypt, you MUST set the same AAD here
   // decipher.setAAD(Buffer.from(tenantId, 'utf8'));
